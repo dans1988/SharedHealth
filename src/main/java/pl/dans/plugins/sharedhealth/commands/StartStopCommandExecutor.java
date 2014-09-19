@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.dans.plugins.sharedhealth.commands;
+package pl.dans.plugins.sharedhealth.commands;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

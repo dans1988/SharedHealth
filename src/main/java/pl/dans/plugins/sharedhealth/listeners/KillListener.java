@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.dans.plugins.sharedhealth.listeners;
+package pl.dans.plugins.sharedhealth.listeners;
 
 import pl.dans.plugins.sharedhealth.SharedHealth;
 import org.bukkit.entity.Player;
@@ -26,7 +26,7 @@ public class KillListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onKill(PlayerDeathEvent event) {
+    public void onKill(final PlayerDeathEvent event) {
         if (!sharedHealth.isRunning()) {
             return;
         }

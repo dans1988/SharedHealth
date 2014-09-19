@@ -1,12 +1,12 @@
 package pl.dans.plugins.sharedhealth;
 
-import com.dans.plugins.sharedhealth.commands.StartStopCommandExecutor;
-import com.dans.plugins.sharedhealth.listeners.DamageListener;
-import com.dans.plugins.sharedhealth.listeners.HealListener;
-import com.dans.plugins.sharedhealth.listeners.KillListener;
 import java.util.logging.Level;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.java.JavaPlugin;
+import pl.dans.plugins.sharedhealth.commands.StartStopCommandExecutor;
+import pl.dans.plugins.sharedhealth.listeners.DamageListener;
+import pl.dans.plugins.sharedhealth.listeners.HealListener;
+import pl.dans.plugins.sharedhealth.listeners.KillListener;
 
 /**
  * Hello world!

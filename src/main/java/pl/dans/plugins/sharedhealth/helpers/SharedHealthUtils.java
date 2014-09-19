@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.dans.plugins.sharedhealth.helpers;
+package pl.dans.plugins.sharedhealth.helpers;
 
 import java.util.ArrayList;
 import java.util.List;

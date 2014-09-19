@@ -3,10 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.dans.plugins.sharedhealth.listeners;
+package pl.dans.plugins.sharedhealth.listeners;
 
 import pl.dans.plugins.sharedhealth.SharedHealth;
-import com.dans.plugins.sharedhealth.helpers.SharedHealthUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,6 +20,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scoreboard.Team;
+import pl.dans.plugins.sharedhealth.helpers.SharedHealthUtils;
 
 /**
  * @author Bergasms
@@ -30,7 +30,7 @@ public class DamageListener implements Listener {
 
     private final SharedHealth sharedHealth;
 
-    public DamageListener(SharedHealth sharedHealth) {
+    public DamageListener(final SharedHealth sharedHealth) {
         this.sharedHealth = sharedHealth;
     }
 
@@ -103,6 +103,7 @@ public class DamageListener implements Listener {
                         thep.damage(thep.getHealth() - damageMap.get(key));
                     }
                 }
+                
                 
                 event.setDamage(p.getHealth() - damageMap.get(p.getName()));
 

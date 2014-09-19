@@ -3,13 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.dans.plugins.sharedhealth.listeners;
+package pl.dans.plugins.sharedhealth.listeners;
 
 import pl.dans.plugins.sharedhealth.SharedHealth;
-import com.dans.plugins.sharedhealth.helpers.SharedHealthUtils;
 import java.util.ArrayList;
 import java.util.List;
-import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -17,6 +15,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.scoreboard.Team;
+import pl.dans.plugins.sharedhealth.helpers.SharedHealthUtils;
 
 /**
  * @author Bergasms
@@ -31,7 +30,7 @@ public class HealListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void gainHealth(EntityRegainHealthEvent event) {
+    public void gainHealth(final EntityRegainHealthEvent event) {
         if (!sharedHealth.isRunning()) {
             return;
         }
