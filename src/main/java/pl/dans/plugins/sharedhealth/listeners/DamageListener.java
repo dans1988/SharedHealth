@@ -19,6 +19,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 import pl.dans.plugins.sharedhealth.helpers.SharedHealthUtils;
 
@@ -29,6 +30,10 @@ import pl.dans.plugins.sharedhealth.helpers.SharedHealthUtils;
 public class DamageListener implements Listener {
 
     private final SharedHealth sharedHealth;
+
+    private static final double ADDED_HEALTH = 200D;
+    
+    private static final int DAMAGE_TASK_DELAY = 1;
 
     public DamageListener(final SharedHealth sharedHealth) {
         this.sharedHealth = sharedHealth;
@@ -46,70 +51,53 @@ public class DamageListener implements Listener {
         if (!(event.getEntity() instanceof Player)) {
             return;
         }
-        
-        
-        if ((event.getCause() != EntityDamageEvent.DamageCause.LAVA) && (event.getCause() != EntityDamageEvent.DamageCause.FIRE)) {
-            Player p = (Player) event.getEntity();
 
-            Team team = p.getScoreboard().getPlayerTeam(p);
-            if (team != null) {
+        if ((event.getCause() == EntityDamageEvent.DamageCause.LAVA)
+                || (event.getCause() == EntityDamageEvent.DamageCause.FIRE)
+                ||  (event.getCause() == EntityDamageEvent.DamageCause.POISON)) {
 
-                List<String> playersNames = new ArrayList<String>();
-
-                for (OfflinePlayer offlinePlayer : team.getPlayers()) {
-                    playersNames.add(offlinePlayer.getName());
-                }
-
-                double damage = event.getDamage();
-
-                
-                List<Player> plist = SharedHealthUtils.orderedPlayerListForNames(playersNames);
-                Map<String, Double> damageMap = new HashMap<String, Double>();
-                for (Player plp : plist) {
-                    damageMap.put(plp.getName(), plp.getHealth());
-                }
-                double curhealth;
-                while (damage > 0) {
-                    String most = null;
-                    curhealth = 0;
-                    for (String key : damageMap.keySet()) {
-                        double val =  damageMap.get(key);
-                        if (most == null) {
-                            most = key;
-                            curhealth = val;
-                        } else if (val > curhealth) {
-                            most = key;
-                            curhealth = val;
-                        }
-                    }
-                    
-                    Random random = new Random(new Date().getTime());
-                    
-                    if (most != null) {
-                        double threshold = (1.0D - SharedHealthUtils.getArmourMultiplier(event, p)) * 100.0D;
-                        if (random.nextInt(10) < 4) {
-                            threshold = 0.0D;
-                        }
-                        if (random.nextInt(100) > threshold) {
-                            damageMap.put(most, damageMap.get(most) - 1.0D);
-                        }
-                    }
-                    damage--;
-                }
-                for (String key : damageMap.keySet()) {
-                    
-                    if (!p.getName().equals(key)) {
-                        Player thep = Bukkit.getServer().getPlayer(key);
-                        thep.damage(thep.getHealth() - damageMap.get(key));
-                    }
-                }
-                
-                
-                event.setDamage(p.getHealth() - damageMap.get(p.getName()));
-
-                //event.setCancelled(true);
-            }
-
+            return;
         }
+
+        final Player player = (Player) event.getEntity();
+
+        final Team team = player.getScoreboard().getPlayerTeam(player);
+
+        if (team == null || team.getSize() <= 1) {
+            return;
+        }
+
+        final double initialMaxHealth = player.getMaxHealth();
+        final double initialHealth = player.getHealth();
+
+        player.setMaxHealth(player.getMaxHealth() + ADDED_HEALTH);
+        player.setHealth(player.getHealth() + ADDED_HEALTH);
+
+        final double raisedInitialHealth = player.getHealth();
+
+        new BukkitRunnable() {
+
+            @Override
+            public void run() {
+                double finalHealth = player.getHealth();
+                double difference = raisedInitialHealth - finalHealth;
+                double divider = team.getSize();
+                double damage = difference / divider;
+                
+                player.setHealth(initialHealth - difference);
+                player.setMaxHealth(initialMaxHealth);
+                
+                
+                for (OfflinePlayer offlinePlayer : team.getPlayers()) {
+                    Player teammate = Bukkit.getPlayer(offlinePlayer.getName());
+
+                    if (teammate != null && !teammate.getName().equals(player.getName())) {
+                        teammate.damage(damage);
+                    }
+                }
+
+            }
+        }.runTaskLater(sharedHealth, DAMAGE_TASK_DELAY);
+
     }
 }
