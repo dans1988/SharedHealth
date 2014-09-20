@@ -6,12 +6,6 @@
 package pl.dans.plugins.sharedhealth.listeners;
 
 import pl.dans.plugins.sharedhealth.SharedHealth;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -21,10 +15,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
-import pl.dans.plugins.sharedhealth.helpers.SharedHealthUtils;
 
 /**
- * @author Bergasms
  * @author Dans
  */
 public class DamageListener implements Listener {
@@ -40,7 +32,7 @@ public class DamageListener implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onDamage(EntityDamageEvent event) {
+    public void onDamage(final EntityDamageEvent event) {
 
         if (!sharedHealth.isRunning()) {
             return;
@@ -67,6 +59,8 @@ public class DamageListener implements Listener {
             return;
         }
 
+        
+        
         final double initialMaxHealth = player.getMaxHealth();
         final double initialHealth = player.getHealth();
 
@@ -74,30 +68,43 @@ public class DamageListener implements Listener {
         player.setHealth(player.getHealth() + ADDED_HEALTH);
 
         final double raisedInitialHealth = player.getHealth();
-
+        
         new BukkitRunnable() {
 
             @Override
             public void run() {
                 double finalHealth = player.getHealth();
                 double difference = raisedInitialHealth - finalHealth;
+                
                 double divider = team.getSize();
                 double damage = difference / divider;
                 
-                player.setHealth(initialHealth - difference);
+                if (initialMaxHealth - damage > 0) {
+                    player.setHealth(initialHealth - damage);
+                    
+                } else {
+                    player.setHealth(0);
+                }
                 player.setMaxHealth(initialMaxHealth);
-                
                 
                 for (OfflinePlayer offlinePlayer : team.getPlayers()) {
                     Player teammate = Bukkit.getPlayer(offlinePlayer.getName());
+                    
+                    if (offlinePlayer.getName().equals(player.getName())) {
+                        continue;
+                    }
 
-                    if (teammate != null && !teammate.getName().equals(player.getName())) {
+                    if (teammate != null) {
                         teammate.damage(damage);
+                    } else if (teammate == null) {
+                        
+                        sharedHealth.setPlayersDamageBalance(offlinePlayer.getName(), new Double(damage * (-1.0D)));
+                        
                     }
                 }
 
             }
         }.runTaskLater(sharedHealth, DAMAGE_TASK_DELAY);
-
+        
     }
 }

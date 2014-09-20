@@ -32,6 +32,7 @@ public class StartStopCommandExecutor implements CommandExecutor {
         if(command.getName().compareToIgnoreCase("startGame") == 0) {
             
             sharedHealth.setRunning(true);
+            sharedHealth.resetDamageBalance();
             Bukkit.getServer().broadcastMessage(ChatColor.GREEN + "SharedHealth started!");
             
         } else if (command.getName().compareToIgnoreCase("stopGame") == 0) {

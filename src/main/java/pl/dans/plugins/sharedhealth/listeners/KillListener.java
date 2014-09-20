@@ -14,7 +14,6 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.scoreboard.Team;
 
 /**
- * @author Bergasms
  * @author Dans
  */
 public class KillListener implements Listener {
