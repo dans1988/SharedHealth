@@ -79,7 +79,7 @@ public class DamageListener implements Listener {
                 double divider = team.getSize();
                 double damage = difference / divider;
                 
-                if (initialMaxHealth - damage > 0) {
+                if (initialHealth - damage > 0) {
                     player.setHealth(initialHealth - damage);
                     
                 } else {
