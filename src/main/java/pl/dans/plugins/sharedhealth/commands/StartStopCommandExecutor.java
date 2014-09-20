@@ -33,12 +33,12 @@ public class StartStopCommandExecutor implements CommandExecutor {
             
             sharedHealth.setRunning(true);
             sharedHealth.resetDamageBalance();
-            Bukkit.getServer().broadcastMessage(ChatColor.GREEN + "SharedHealth started!");
+            Bukkit.getServer().broadcastMessage(ChatColor.GREEN + "SharedHealth activated!");
             
         } else if (command.getName().compareToIgnoreCase("stopGame") == 0) {
             
             sharedHealth.setRunning(false);
-            Bukkit.getServer().broadcastMessage(ChatColor.GREEN + "SharedHealth stopped!");
+            Bukkit.getServer().broadcastMessage(ChatColor.GREEN + "SharedHealth deactivated!");
         }
         
         

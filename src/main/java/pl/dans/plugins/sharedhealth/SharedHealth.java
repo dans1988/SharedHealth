@@ -64,12 +64,8 @@ public class SharedHealth extends JavaPlugin
     public void setPlayersDamageBalance(String player, Double balance) {
         
         if (!damageBalance.containsKey(player)) {
-            
-            System.out.println("No such key " + player + " " + balance);
             damageBalance.put(player, balance);
         } else {
-            
-            System.out.println("Key exists " + player + " " + balance);
             Double previousBalance = damageBalance.get(player);
             damageBalance.put(player, previousBalance + balance);
         }
