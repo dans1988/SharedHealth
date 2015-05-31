@@ -1,10 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pl.dans.plugins.sharedhealth.listeners;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import pl.dans.plugins.sharedhealth.SharedHealth;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -16,95 +13,100 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 
-/**
- * @author Dans
- */
 public class DamageListener implements Listener {
 
     private final SharedHealth sharedHealth;
-
-    private static final double ADDED_HEALTH = 200D;
-    
-    private static final int DAMAGE_TASK_DELAY = 1;
 
     public DamageListener(final SharedHealth sharedHealth) {
         this.sharedHealth = sharedHealth;
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onDamage(final EntityDamageEvent event) {
 
         if (!sharedHealth.isRunning()) {
             return;
         }
-        if (event.isCancelled()) {
-            return;
-        }
+
         if (!(event.getEntity() instanceof Player)) {
             return;
         }
 
+        final Player player = (Player) event.getEntity();
+        
+
+        sharedHealth.setSharedDamage(player.getName(), false);
+        
+        
+
         if ((event.getCause() == EntityDamageEvent.DamageCause.LAVA)
                 || (event.getCause() == EntityDamageEvent.DamageCause.FIRE)
-                ||  (event.getCause() == EntityDamageEvent.DamageCause.POISON)) {
+                || (event.getCause() == EntityDamageEvent.DamageCause.POISON)) {
 
             return;
         }
-
-        final Player player = (Player) event.getEntity();
 
         final Team team = player.getScoreboard().getPlayerTeam(player);
 
         if (team == null || team.getSize() <= 1) {
             return;
         }
-
         
-        
-        final double initialMaxHealth = player.getMaxHealth();
-        final double initialHealth = player.getHealth();
 
-        player.setMaxHealth(player.getMaxHealth() + ADDED_HEALTH);
-        player.setHealth(player.getHealth() + ADDED_HEALTH);
+        double damage = event.getFinalDamage();
+        double teamSize =team.getSize();
+        double sharedDamage = damage / teamSize;
 
-        final double raisedInitialHealth = player.getHealth();
-        
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-                double finalHealth = player.getHealth();
-                double difference = raisedInitialHealth - finalHealth;
+        for (OfflinePlayer teammate : team.getPlayers()) {
+            Player onlineTeammate = Bukkit.getServer().getPlayer(teammate.getUniqueId());
+            
+            
+            if (onlineTeammate != null) {
+                double currentHealth = onlineTeammate.getHealth();
+                double finalHealth = currentHealth - sharedDamage;
                 
-                double divider = team.getSize();
-                double damage = difference / divider;
-                
-                if (initialHealth - damage > 0) {
-                    player.setHealth(initialHealth - damage);
-                    
-                } else {
-                    player.setHealth(0);
-                }
-                player.setMaxHealth(initialMaxHealth);
-                
-                for (OfflinePlayer offlinePlayer : team.getPlayers()) {
-                    Player teammate = Bukkit.getPlayer(offlinePlayer.getName());
-                    
-                    if (offlinePlayer.getName().equals(player.getName())) {
-                        continue;
-                    }
 
-                    if (teammate != null) {
-                        teammate.damage(damage);
-                    } else if (teammate == null) {
-                        
-                        sharedHealth.setPlayersDamageBalance(offlinePlayer.getName(), new Double(damage * (-1.0D)));
-                        
-                    }
+                if (finalHealth < 0.0D) {
+                    finalHealth = 0.0D;
                 }
 
+                //double finalHealth = (currentHealth - sharedDamage > 0.0D) ? currentHealth - sharedDamage : 0.0D;
+                //player who took damage will be handled differently
+                if (!teammate.getUniqueId().equals(player.getUniqueId())) {
+                    onlineTeammate.setHealth(finalHealth);
+                    onlineTeammate.damage(0);
+                    sharedHealth.setSharedDamage(onlineTeammate.getName(), true);
+                }
+
+            } else {
+                sharedHealth.setPlayersDamageBalance(teammate.getName(), sharedDamage * -1.0D);
+                sharedHealth.setSharedDamage(teammate.getName(), true);
             }
-        }.runTaskLater(sharedHealth, DAMAGE_TASK_DELAY);
+        }
+
+        //don't modify the health of the player who took damage if he will die anyway
+        //this prevents the death message
+        double currentHealth = player.getHealth();
+
+        double finalHealth = currentHealth - sharedDamage;
+
+        if (finalHealth < 0.0D) {
+            finalHealth = 0;
+        }
         
+
+        
+        //apply damage later to avoid reduction from enchants if player wouldn't die
+        //or kill immediately if he is supposed to die anyway
+        if (finalHealth > 0) {
+            
+            player.setHealth(finalHealth);
+            
+            event.setCancelled(true); 
+            
+        } else {
+            event.setDamage(event.getDamage() * 1000);
+        }
+
     }
 }

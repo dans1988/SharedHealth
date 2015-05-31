@@ -1,37 +1,38 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pl.dans.plugins.sharedhealth.listeners;
 
-import pl.dans.plugins.sharedhealth.SharedHealth;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.scoreboard.Team;
+import pl.dans.plugins.sharedhealth.SharedHealth;
 
 /**
+ *
  * @author Dans
  */
-public class KillListener implements Listener {
-
+public class PlayerDeathListener implements Listener {
+    
     private final SharedHealth sharedHealth;
 
-    public KillListener(SharedHealth sharedHealth) {
+    public PlayerDeathListener(SharedHealth sharedHealth) {
         this.sharedHealth = sharedHealth;
     }
-
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onKill(final PlayerDeathEvent event) {
+    
+    @EventHandler
+    public void onPlayerDeath(final PlayerDeathEvent event) {
+        
         if (!sharedHealth.isRunning()) {
             return;
         }
         
+        String playerName = event.getEntity().getName();
         
-
+        
+        if (sharedHealth.getSharedDamage().get(playerName) != null && sharedHealth.getSharedDamage().get(playerName) == true) {
+            event.setDeathMessage(playerName + " died from sharing health");
+        }
+        
         Player player = event.getEntity();
         
         Team team = player.getScoreboard().getPlayerTeam(player);
@@ -40,4 +41,5 @@ public class KillListener implements Listener {
             team.removePlayer(player);
         }
     }
+    
 }

@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package pl.dans.plugins.sharedhealth.listeners;
 
 import org.bukkit.entity.Player;
@@ -41,6 +36,7 @@ public class PlayerJoinListener implements Listener {
             
             player.setHealth(newHealth);
             sharedHealth.resetPlayersDamageBalance(player.getName());
+            
         }
 
     }

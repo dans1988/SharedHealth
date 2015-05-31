@@ -8,18 +8,20 @@ import org.bukkit.plugin.java.JavaPlugin;
 import pl.dans.plugins.sharedhealth.commands.StartStopCommandExecutor;
 import pl.dans.plugins.sharedhealth.listeners.DamageListener;
 import pl.dans.plugins.sharedhealth.listeners.HealListener;
-import pl.dans.plugins.sharedhealth.listeners.KillListener;
+import pl.dans.plugins.sharedhealth.listeners.PlayerDeathListener;
 import pl.dans.plugins.sharedhealth.listeners.PlayerJoinListener;
 
 /**
- * Hello world!
  *
+ * @author Dans
  */
 public class SharedHealth extends JavaPlugin
 {
     private boolean running;
     
     private Map<String, Double> damageBalance;
+    
+    private Map<String, Boolean> sharedDamage;
     
     
     
@@ -28,16 +30,17 @@ public class SharedHealth extends JavaPlugin
         getLogger().log(Level.INFO, "{0}onEnable", ChatColor.RED);
         
         getServer().getPluginManager().registerEvents(new DamageListener(this), this);
-        getServer().getPluginManager().registerEvents(new KillListener(this), this);
         getServer().getPluginManager().registerEvents(new HealListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
+        getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), this);
         
         StartStopCommandExecutor startStopCommandExecutor = new StartStopCommandExecutor(this);
         
-        getCommand("startGame").setExecutor(startStopCommandExecutor);
-        getCommand("stopGame").setExecutor(startStopCommandExecutor);
+        getCommand("shstart").setExecutor(startStopCommandExecutor);
+        getCommand("shstop").setExecutor(startStopCommandExecutor);
         
         damageBalance = new HashMap<String, Double>();
+        sharedDamage = new HashMap<String, Boolean>();
     }
 
     @Override
@@ -80,7 +83,17 @@ public class SharedHealth extends JavaPlugin
             damageBalance.put(player, 0.0D);
         }
     }
+
+    public Map<String, Boolean> getSharedDamage() {
+        return sharedDamage;
+    }
     
     
+    public void setSharedDamage(String name, Boolean wasShared) {
+        sharedDamage.put(name, wasShared);
+    }
     
+    public void resetSharedDamage() {
+        sharedDamage = new HashMap<String, Boolean>();
+    }
 }

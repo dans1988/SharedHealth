@@ -3,12 +3,12 @@ main: pl.dans.plugins.sharedhealth.SharedHealth
 version: 1.0
   
 commands:
-    startGame:
+    shstart:
         description: Starts SharedHealth
         usage: /<command> 
         permission: SharedHealth.basic
         permission-message: You don't have <permission>
-    stopGame:
+    shstop:
         description: Stops SharedHealth
         usage: /<command> 
         permission: SharedHealth.basic
