@@ -12,34 +12,33 @@ import pl.dans.plugins.sharedhealth.SharedHealth;
  * @author Dans
  */
 public class PlayerDeathListener implements Listener {
-    
+
     private final SharedHealth sharedHealth;
 
     public PlayerDeathListener(SharedHealth sharedHealth) {
         this.sharedHealth = sharedHealth;
     }
-    
+
     @EventHandler
     public void onPlayerDeath(final PlayerDeathEvent event) {
-        
+
         if (!sharedHealth.isRunning()) {
             return;
         }
-        
+
         String playerName = event.getEntity().getName();
-        
-        
+
         if (sharedHealth.getSharedDamage().get(playerName) != null && sharedHealth.getSharedDamage().get(playerName) == true) {
             event.setDeathMessage(playerName + " died from sharing health");
         }
-        
+
         Player player = event.getEntity();
-        
+
         Team team = player.getScoreboard().getPlayerTeam(player);
-        
+
         if (team != null) {
             team.removePlayer(player);
         }
     }
-    
+
 }

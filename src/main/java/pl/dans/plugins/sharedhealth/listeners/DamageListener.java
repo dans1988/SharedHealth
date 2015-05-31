@@ -1,7 +1,5 @@
 package pl.dans.plugins.sharedhealth.listeners;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import pl.dans.plugins.sharedhealth.SharedHealth;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -10,7 +8,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 
 public class DamageListener implements Listener {
@@ -33,11 +30,8 @@ public class DamageListener implements Listener {
         }
 
         final Player player = (Player) event.getEntity();
-        
 
         sharedHealth.setSharedDamage(player.getName(), false);
-        
-        
 
         if ((event.getCause() == EntityDamageEvent.DamageCause.LAVA)
                 || (event.getCause() == EntityDamageEvent.DamageCause.FIRE)
@@ -51,26 +45,22 @@ public class DamageListener implements Listener {
         if (team == null || team.getSize() <= 1) {
             return;
         }
-        
 
         double damage = event.getFinalDamage();
-        double teamSize =team.getSize();
+        double teamSize = team.getSize();
         double sharedDamage = damage / teamSize;
 
         for (OfflinePlayer teammate : team.getPlayers()) {
             Player onlineTeammate = Bukkit.getServer().getPlayer(teammate.getUniqueId());
-            
-            
+
             if (onlineTeammate != null) {
                 double currentHealth = onlineTeammate.getHealth();
                 double finalHealth = currentHealth - sharedDamage;
-                
 
                 if (finalHealth < 0.0D) {
                     finalHealth = 0.0D;
                 }
 
-                //double finalHealth = (currentHealth - sharedDamage > 0.0D) ? currentHealth - sharedDamage : 0.0D;
                 //player who took damage will be handled differently
                 if (!teammate.getUniqueId().equals(player.getUniqueId())) {
                     onlineTeammate.setHealth(finalHealth);
@@ -84,8 +74,6 @@ public class DamageListener implements Listener {
             }
         }
 
-        //don't modify the health of the player who took damage if he will die anyway
-        //this prevents the death message
         double currentHealth = player.getHealth();
 
         double finalHealth = currentHealth - sharedDamage;
@@ -93,17 +81,15 @@ public class DamageListener implements Listener {
         if (finalHealth < 0.0D) {
             finalHealth = 0;
         }
-        
 
-        
         //apply damage later to avoid reduction from enchants if player wouldn't die
         //or kill immediately if he is supposed to die anyway
         if (finalHealth > 0) {
-            
+
             player.setHealth(finalHealth);
-            
-            event.setCancelled(true); 
-            
+
+            event.setCancelled(true);
+
         } else {
             event.setDamage(event.getDamage() * 1000);
         }

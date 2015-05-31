@@ -15,30 +15,28 @@ import pl.dans.plugins.sharedhealth.listeners.PlayerJoinListener;
  *
  * @author Dans
  */
-public class SharedHealth extends JavaPlugin
-{
+public class SharedHealth extends JavaPlugin {
+
     private boolean running;
-    
+
     private Map<String, Double> damageBalance;
-    
+
     private Map<String, Boolean> sharedDamage;
-    
-    
-    
+
     @Override
     public void onEnable() {
         getLogger().log(Level.INFO, "{0}onEnable", ChatColor.RED);
-        
+
         getServer().getPluginManager().registerEvents(new DamageListener(this), this);
         getServer().getPluginManager().registerEvents(new HealListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerDeathListener(this), this);
-        
+
         StartStopCommandExecutor startStopCommandExecutor = new StartStopCommandExecutor(this);
-        
+
         getCommand("shstart").setExecutor(startStopCommandExecutor);
         getCommand("shstop").setExecutor(startStopCommandExecutor);
-        
+
         damageBalance = new HashMap<String, Double>();
         sharedDamage = new HashMap<String, Boolean>();
     }
@@ -51,7 +49,7 @@ public class SharedHealth extends JavaPlugin
     public void setRunning(boolean running) {
         this.running = running;
     }
-    
+
     public boolean isRunning() {
         return running;
     }
@@ -65,7 +63,7 @@ public class SharedHealth extends JavaPlugin
     }
 
     public void setPlayersDamageBalance(String player, Double balance) {
-        
+
         if (!damageBalance.containsKey(player)) {
             damageBalance.put(player, balance);
         } else {
@@ -73,11 +71,11 @@ public class SharedHealth extends JavaPlugin
             damageBalance.put(player, previousBalance + balance);
         }
     }
-    
+
     public void resetDamageBalance() {
         this.damageBalance = new HashMap<String, Double>();
     }
-    
+
     public void resetPlayersDamageBalance(String player) {
         if (damageBalance.containsKey(player)) {
             damageBalance.put(player, 0.0D);
@@ -87,12 +85,11 @@ public class SharedHealth extends JavaPlugin
     public Map<String, Boolean> getSharedDamage() {
         return sharedDamage;
     }
-    
-    
+
     public void setSharedDamage(String name, Boolean wasShared) {
         sharedDamage.put(name, wasShared);
     }
-    
+
     public void resetSharedDamage() {
         sharedDamage = new HashMap<String, Boolean>();
     }

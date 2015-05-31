@@ -28,15 +28,14 @@ public class PlayerJoinListener implements Listener {
         Player player = event.getPlayer();
 
         double balance = sharedHealth.getPlayersDamageBalance(player.getName());
-        
 
         if (balance != 0.0D) {
-            
+
             double newHealth = (player.getHealth() + balance > 0.0D) ? player.getHealth() + balance : 0.0D;
-            
+
             player.setHealth(newHealth);
             sharedHealth.resetPlayersDamageBalance(player.getName());
-            
+
         }
 
     }
