@@ -1,6 +1,5 @@
 package pl.dans.plugins.sharedhealth.listeners;
 
-import java.math.BigDecimal;
 import pl.dans.plugins.sharedhealth.SharedHealth;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -36,20 +35,21 @@ public class HealListener implements Listener {
         Team team = p.getScoreboard().getPlayerTeam(p);
         if (team != null && team.getSize() > 1) {
 
-            BigDecimal divider = BigDecimal.valueOf(team.getSize());
+            double divider = team.getSize();
 
-            BigDecimal amount = BigDecimal.valueOf(event.getAmount());
-            BigDecimal gain = amount.divide(divider);
+            double amount = event.getAmount();
+            double gain = amount / divider;
 
             for (OfflinePlayer offlinePlayer : team.getPlayers()) {
                 Player teammate = Bukkit.getPlayer(offlinePlayer.getUniqueId());
 
                 if (teammate != null) {
-                    BigDecimal teammateHealth = BigDecimal.valueOf(teammate.getHealth());
-                    teammate.setHealth(teammateHealth.add(gain).doubleValue());
+                    double teammateHealth = teammate.getHealth();
+                    double finalHealth = teammateHealth + gain;
+                    teammate.setHealth(finalHealth);
                 } else {
 
-                    sharedHealth.setPlayersDamageBalance(offlinePlayer.getName(), gain.doubleValue());
+                    sharedHealth.setPlayersDamageBalance(offlinePlayer.getName(), gain);
                 }
             }
 

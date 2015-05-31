@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scoreboard.Team;
 
 public class DamageListener implements Listener {
@@ -64,7 +65,7 @@ public class DamageListener implements Listener {
                 //player who took damage will be handled differently
                 if (!teammate.getUniqueId().equals(player.getUniqueId())) {
                     onlineTeammate.setHealth(finalHealth);
-                    onlineTeammate.damage(0);
+                    onlineTeammate.damage(0.0D);
                     sharedHealth.setSharedDamage(onlineTeammate.getName(), true);
                 }
 
@@ -84,11 +85,20 @@ public class DamageListener implements Listener {
 
         //apply damage later to avoid reduction from enchants if player wouldn't die
         //or kill immediately if he is supposed to die anyway
+        //cancelling event would prevent knockback, delay damage until after the event instead
         if (finalHealth > 0) {
 
-            player.setHealth(finalHealth);
+            final double finalHealthAsynch = finalHealth;
 
-            event.setCancelled(true);
+            event.setDamage(0.0D);
+
+            new BukkitRunnable() {
+
+                @Override
+                public void run() {
+                    player.setHealth(finalHealthAsynch);
+                }
+            }.runTaskLater(sharedHealth, 1);
 
         } else {
             event.setDamage(event.getDamage() * 1000);
