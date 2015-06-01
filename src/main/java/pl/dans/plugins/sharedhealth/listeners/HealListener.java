@@ -46,6 +46,11 @@ public class HealListener implements Listener {
                 if (teammate != null) {
                     double teammateHealth = teammate.getHealth();
                     double finalHealth = teammateHealth + gain;
+                    
+                    if (finalHealth > teammate.getMaxHealth()) {
+                        finalHealth = teammate.getMaxHealth();
+                    }
+                    
                     teammate.setHealth(finalHealth);
                 } else {
 

@@ -32,7 +32,11 @@ public class PlayerJoinListener implements Listener {
         if (balance != 0.0D) {
 
             double newHealth = (player.getHealth() + balance > 0.0D) ? player.getHealth() + balance : 0.0D;
-
+            
+            if (newHealth > player.getMaxHealth()) {
+                newHealth = player.getMaxHealth();
+            }
+            
             player.setHealth(newHealth);
             sharedHealth.resetPlayersDamageBalance(player.getName());
 

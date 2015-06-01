@@ -52,7 +52,7 @@ public class DamageListener implements Listener {
         double sharedDamage = damage / teamSize;
 
         for (OfflinePlayer teammate : team.getPlayers()) {
-            Player onlineTeammate = Bukkit.getServer().getPlayer(teammate.getUniqueId());
+            final Player onlineTeammate = Bukkit.getServer().getPlayer(teammate.getUniqueId());
 
             if (onlineTeammate != null) {
                 double currentHealth = onlineTeammate.getHealth();
@@ -62,11 +62,15 @@ public class DamageListener implements Listener {
                     finalHealth = 0.0D;
                 }
 
+                final double finalHealthAsynch = finalHealth;
+
                 //player who took damage will be handled differently
                 if (!teammate.getUniqueId().equals(player.getUniqueId())) {
-                    onlineTeammate.setHealth(finalHealth);
-                    onlineTeammate.damage(0.0D);
+
                     sharedHealth.setSharedDamage(onlineTeammate.getName(), true);
+                    onlineTeammate.damage(0.0D);
+                    onlineTeammate.setHealth(finalHealthAsynch);
+
                 }
 
             } else {

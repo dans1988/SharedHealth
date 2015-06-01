@@ -1,5 +1,7 @@
 package pl.dans.plugins.sharedhealth.listeners;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -25,11 +27,17 @@ public class PlayerDeathListener implements Listener {
         if (!sharedHealth.isRunning()) {
             return;
         }
+        
+        Bukkit.broadcastMessage("I'm here!");
 
         String playerName = event.getEntity().getName();
+        
+        String playerDisplayName = event.getEntity().getDisplayName();
+        
+        
 
         if (sharedHealth.getSharedDamage().get(playerName) != null && sharedHealth.getSharedDamage().get(playerName) == true) {
-            event.setDeathMessage(playerName + " died from sharing health");
+            event.setDeathMessage(playerDisplayName + ChatColor.WHITE + " died from sharing health");
         }
 
         Player player = event.getEntity();
