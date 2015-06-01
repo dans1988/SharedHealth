@@ -27,8 +27,6 @@ public class PlayerDeathListener implements Listener {
         if (!sharedHealth.isRunning()) {
             return;
         }
-        
-        Bukkit.broadcastMessage("I'm here!");
 
         String playerName = event.getEntity().getName();
         
