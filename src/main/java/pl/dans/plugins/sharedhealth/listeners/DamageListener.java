@@ -34,13 +34,6 @@ public class DamageListener implements Listener {
 
         sharedHealth.setSharedDamage(player.getName(), false);
 
-        if ((event.getCause() == EntityDamageEvent.DamageCause.LAVA)
-                || (event.getCause() == EntityDamageEvent.DamageCause.FIRE)
-                || (event.getCause() == EntityDamageEvent.DamageCause.POISON)) {
-
-            return;
-        }
-
         final Team team = player.getScoreboard().getPlayerTeam(player);
 
         if (team == null || team.getSize() <= 1) {
